@@ -1,10 +1,16 @@
 from airflow.decorators import dag, task
-from airflow.hooks.base import BaseHook
+from cosmos import DbtDag, DbtTaskGroup
+from cosmos.profiles import PostgresUserPasswordProfileMapping
 from pendulum import datetime, DateTime
 
 from include.spacex.tasks import query_api, store_json, store_csv
 from include.utils.datalake import storage_options
 from include.utils.warehouse import engine
+from include.config import (
+    DBT_PROFILE_CONFIG,
+    DBT_PROJECT_CONFIG,
+    DBT_EXECUTION_CONFIG,
+)
 
 
 @dag(
@@ -114,7 +120,12 @@ def etl_spacex():
         # It may be a separate dag
         print("I am DBT Transformation")
 
-    transformation = transformation()
+    transformation = DbtTaskGroup(
+        group_id="dbt_transformation",
+        profile_config=DBT_PROFILE_CONFIG,
+        project_config=DBT_PROJECT_CONFIG,
+        execution_config=DBT_EXECUTION_CONFIG,
+    )
 
     job_list = ["starlink", "launches"]
     for job in job_list:
