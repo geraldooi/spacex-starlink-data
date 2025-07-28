@@ -136,12 +136,6 @@ def etl_spacex():
             index=False,
         )
 
-    @task
-    def transformation():
-        # TODO: Will call dbt here
-        # It may be a separate dag
-        print("I am DBT Transformation")
-
     transformation = DbtTaskGroup(
         group_id="dbt_transformation",
         profile_config=DBT_PROFILE_CONFIG,
