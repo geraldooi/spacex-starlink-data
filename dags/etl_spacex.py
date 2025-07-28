@@ -101,16 +101,38 @@ def etl_spacex():
     def load_data_to_warehouse(data_name: str, data_path: str):
 
         import pandas as pd
+        from sqlalchemy import inspect, text
+
+        table_name = f"{data_name}_bronze"
 
         df = pd.read_csv(
             data_path,
             storage_options=storage_options,
         )
 
+        with engine.connect() as connection:
+            inspector = inspect(connection)
+
+            if inspector.has_table(table_name, schema="public"):
+                print(f"Table public.{table_name} exists. Truncating table ...")
+                truncate_sql = text(
+                    f'TRUNCATE TABLE "public"."{table_name}" RESTART IDENTITY CASCADE;'
+                )
+                connection.execute(truncate_sql)
+                print(f"Table public.{table_name} truncated successfully.")
+
+            else:
+                print(f"Table public.{table_name} does not exists. Creating table ...")
+                df.head(0).to_sql(
+                    name=table_name, con=connection, if_exists="replace", index=False
+                )
+                print(f"Table public.{table_name} created successfully.")
+
+        # Append new data
         df.to_sql(
-            name=f"{data_name}_bronze",
+            name=table_name,
             con=engine,
-            if_exists="replace",
+            if_exists="append",
             index=False,
         )
 
