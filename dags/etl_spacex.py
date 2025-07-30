@@ -1,7 +1,8 @@
+import logging
+
 from airflow.decorators import dag, task
-from cosmos import DbtDag, DbtTaskGroup
-from cosmos.profiles import PostgresUserPasswordProfileMapping
-from pendulum import datetime, DateTime
+from cosmos import DbtTaskGroup
+from pendulum import datetime, duration, DateTime
 
 from include.spacex.tasks import query_api, store_json, store_csv
 from include.utils.datalake import storage_options
@@ -12,12 +13,19 @@ from include.config import (
     DBT_EXECUTION_CONFIG,
 )
 
+task_logger = logging.getLogger("airflow.task")
+
 
 @dag(
     start_date=datetime(2019, 1, 1, tz="Asia/Kuala_Lumpur"),
     schedule="@daily",
     catchup=False,
     tags=["starlink"],
+    default_args={
+        "retries": 3,
+        "retry_delay": duration(minutes=3),  # Wait 3 minutes for each retry
+        "retry_exponential_backoff": True,
+    },
 )
 def etl_spacex():
 
@@ -115,15 +123,17 @@ def etl_spacex():
             inspector = inspect(connection)
 
             if inspector.has_table(table_name, schema=schema):
-                print(f"Table {schema}.{table_name} exists. Truncating table ...")
+                task_logger.info(
+                    f"Table {schema}.{table_name} exists. Truncating table ..."
+                )
                 truncate_sql = text(
                     f'TRUNCATE TABLE "{schema}"."{table_name}" RESTART IDENTITY CASCADE;'
                 )
                 connection.execute(truncate_sql)
-                print(f"Table {schema}.{table_name} truncated successfully.")
+                task_logger.info(f"Table {schema}.{table_name} truncated successfully.")
 
             else:
-                print(
+                task_logger.info(
                     f"Table {schema}.{table_name} does not exists. Creating table ..."
                 )
                 df.head(0).to_sql(
@@ -133,7 +143,7 @@ def etl_spacex():
                     if_exists="replace",
                     index=False,
                 )
-                print(f"Table {schema}.{table_name} created successfully.")
+                task_logger.info(f"Table {schema}.{table_name} created successfully.")
 
         # Append new data
         df.to_sql(
