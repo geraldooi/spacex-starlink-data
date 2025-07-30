@@ -1,0 +1,22 @@
+version: 2
+
+macros:
+  - name: format_date_as_string
+    description: >
+      This macros receives a date column and returns then into
+      date string. (default: yyyyMMdd).
+    arguments:
+      - name: date_column
+        type: date
+        description: >
+          date column.
+  
+  - name: get_decay_indicator
+    description: >
+      This macros receives a decay flag (1 or 0) and returns
+      corresponding indicator where it is "Decay" or "Non Decay"
+    arguments:
+      - name: decay_type
+        type: int
+        description: >
+          decay type value. It is either 0 or 1.

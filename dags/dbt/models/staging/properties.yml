@@ -1,0 +1,58 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: spacex
+    schema: public
+    tables:
+      - name: raw_starlink
+      - name: raw_launches
+
+models:
+  - name: stg_spacex__starlinks
+    description: >
+      A clean and columns type casted for Starlinks satellites. Excluding records with missing launch date.
+    columns:
+      - name: starlink_id
+        description: Unique ID for Starlink satellites
+        tests:
+          - unique
+          - not_null
+      - name: launch_id
+        description: Launch event ID in associated with Starlink satellites.
+      - name: object_code
+        description: OBJECT_ID from SpaceTrack
+      - name: object_name
+        description: Common OBJECT_NAME from SpaceTrack like STARLINK-30
+      - name: launch_date
+        description: The date the Starlink satellites was launched.
+        data_type: date
+      - name: launch_date_key
+        description: The launch_date formatted as string (YYYYMMDD) for key purpose.
+      - name: creation_date
+        description: The date the SpaceTrack was created or last updated.
+        data_type: date
+      - name: creation_date_key
+        description: The creation_date formatted as string (YYYYMMDD) for key purpose.
+      - name: decay_indicator
+        description: Indicates if the satellites has decayed ('Decay' or 'Non Decay')
+      - name: decay_date
+        description: The date the satellites slow down (decayed).
+      - name: decay_date_key
+        description: The decay_date formatted as string (YYYYMMDD) for key purpose.
+ 
+  - name: stg_spacex__launches
+    description: Details about the launch events.
+    columns:
+        - name: launch_id
+          description: Unique ID for launch event.
+          tests:
+            - unique
+            - not_null
+        - name: launch_date
+          description: The date of the launch event.
+          data_type: date
+        - name: launch_date_key
+          description: The launch_date formatted as string (YYYYMMDD) for key purpose.
+        - name: launch_name
+          description: General name for the launch event.

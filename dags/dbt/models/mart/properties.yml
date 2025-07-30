@@ -1,0 +1,75 @@
+version: 2
+
+models:
+  - name: fact_starlink_snapshots
+    description: >
+      This table shows all current active starlink satellites.
+      Their launch history info and when they being tracked.
+    columns:
+      - name: starlink_id
+        description: Unique ID for starlink satellites.
+        test:
+          - unique
+          - not_null
+        constraints:
+          - type: unique
+          - type: not_null
+          - type: primary_key
+          - type: foreign_key
+            to: ref('dim_starlinks')
+            to_columns: [starlink_id]
+      - name: launch_id
+        description: Unique ID for launch event.
+        constraints:
+          - type: foreign_key
+            to: ref('dim_launches')
+            to_columns: [launch_id]
+      - name: creation_date_key
+        description: The creation_date formatted as string (YYYYMMDD)
+        constraints:
+          - type: foreign_key
+            to: ref('dim_dates')
+            to_columns: [date_key]
+
+  
+  - name: dim_starlinks
+    columns:
+      - name: starlink_id
+        description: Unique ID for Starlink satellites.
+        constraints:
+          - type: primary_key
+      - name: decay_date_key
+        description: The decay_date formatted as string.
+      - name: decay_indicator
+        description: Indicates if the satellites has decayed ('Decay' or 'Non Decay')
+      - name: object_code
+        description: OBJECT_ID from SpaceTrack
+      - name: object_name
+        description: Common OBJECT_NAME from SpaceTrack like STARLINK-30
+  
+  - name: dim_launches
+    columns:
+      - name: launch_id
+        description: Launch event ID in associated with Starlink satellites.
+        constraints:
+          - type: primary_key
+      - name: launch_date_key
+        description: The launch_date formatted as string (YYYYMMDD) for key purpose.
+      - name: launch_name
+        description: The name of the launch event.
+  
+  - name: dim_dates
+    columns:
+      - name: date_key
+        description: The date formatted as string for key purpose.
+        constraints:
+          - type: primary_key
+      - name: iso_date
+        description: The date in ISO format (YYYY-MM-DD).
+      - name: calendar_year
+        description: Year number.
+      - name: calendar_month
+        description: The month number. From 1 to 12.
+      - name: day_of_month
+        description: The day number in the month. From 1 to 31.
+

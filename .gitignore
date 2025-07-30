@@ -10,3 +10,6 @@ webserver_config.py
 airflow.cfg
 airflow.db
 include/data/minio/
+target/
+dbt_packages/
+logs/

@@ -1,0 +1,12 @@
+spacex_dbt:
+  outputs:
+    dev:
+      dbname: spacex
+      host: warehouse
+      pass: warehouse123
+      port: 5432
+      schema: public
+      threads: 1
+      type: postgres
+      user: warehouse
+  target: dev
