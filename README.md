@@ -118,7 +118,7 @@ In order to get production ready data pipeline, I should use Kubernetes as it is
     - use configMap if needed
 4. Deploy my DAGs using gitSync
 5. Configure Persistent Volume and Persistent Volume Claim to save logs
-6. Could use PV and PVC to sync dags locally with using gitSync
+6. Could use PV and PVC to sync dags locally without using gitSync
 
 > [!Note]
 > References:
@@ -127,4 +127,4 @@ In order to get production ready data pipeline, I should use Kubernetes as it is
 
 Once the Airflow Kubernetes is configured correctly, I may want to migrate my current tasks (which used Python operators) to the `KubernetesPodOperator`, including dbt transformation task.
 
-Once Airflow is running in Kubernetes and the data pipeline is working as expected, the next step would be to implement alerts and notifications. Currently, we have to log into the Airflow UI to check if the pipeline has run successfully. It would be better to have alerts and notifications sent directly to a chat application (e.g. Slack).
+Once Airflow is running in Kubernetes and the data pipeline is working as expected, the next step would be to implement alerts and notifications. Currently, we have to login into the Airflow UI to check if the pipeline has run successfully. It would be better to have alerts and notifications sent directly to a chat application (e.g. Slack).
