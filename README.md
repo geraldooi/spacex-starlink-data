@@ -75,7 +75,7 @@ To check if dataset is ready, you may sign in to Postgres, you may use [pgAdmin 
 | Password | warehouse123 |
 
 > [!Note]
-> I used port `5433` to prevent it clashes with Airflow's Postgres.
+> I used port `5433` to prevent it clashes with Airflow's Postgres.  
 > I used Postgres to simulate my data warehouse.
 
 In order to complete this exercise within limited timeframe, I have come out with the simplest data models that are sufficient to answer the business question above.
@@ -89,9 +89,15 @@ In this data model, I've used factless fact table as it doesn't have any metrics
 Challenges
 ==========
 
-Mainly due to the limitations of the available documentation and my current domain knowledge of spacex, I couldn't clearly identity daily transactions like of data from this API. Therefore, I have temporarily put the daily ingestion plan aside. In a real world project, a daily ingestion pipeline would allow the entire process to remain idempotent, making it easy to backfill or rerun any specific dates. With that said, I made the tradeoff here, instead of performing incremental updates, I have chosen to simply ingest and replace all the data in my data warehouse during the daily pipeline execution. This is not an adviceable approach for a professional project with a large dataset, as it cause a significant waste of resource. By replacing the data completely, the dbt transformation must recreate the data from scratch every time. With a larger dataset, this translates to longer compute times and higher cost.
+Mainly due to the limitations of the available documentation and my current domain knowledge of spacex, I couldn't clearly identify daily transactions (like a sales or finance transactions) data from this API. Therefore, I have temporarily put the daily ingestion plan aside. 
 
-The second challenge was related to the tech stack required for this exercise. With the limited experience using kubernetes, I faced a choice: either develop with Airflow Kubernetes, which carries a high risk of getting stuck on configuration and having to redo everything, or start development locally, get everything working, and then chain the piece together. I chose the latter, which is start by develping with Airflow locally. The tradeoff I made was primarily due to time constraints. I would rather have a working solution first than a perfect one from the very begining. Once a working solution is in place, I can then transition towards the end goal of running it in Airflow Kubernetes. That was my strategy to get things done. With the stack I chose, I am using [Astro CLI](https://www.astronomer.io/docs/astro/cli/overview/) and [Cosmos](https://astronomer.github.io/astronomer-cosmos/) to run the entire process.
+In a real world project, a daily ingestion pipeline would allow the entire process to remain idempotent, making it easy to backfill or rerun any specific dates. With that said, I made the tradeoff here, instead of performing incremental updates, I have chosen to simply ingest and replace all the data in my data warehouse during the daily pipeline execution. 
+
+This is not an adviceable approach for a professional project with a large dataset, as it cause a significant waste of resource. By replacing the data completely, the dbt transformation must recreate the data from scratch every time. With a larger dataset, this translates to longer compute times and higher cost.
+
+The second challenge was related to the tech stack required for this exercise. With the limited experience using kubernetes, I faced a choice: either develop with Airflow Kubernetes, which carries a high risk of getting stuck on configuration and having to redo everything, or start development locally, get everything working, and then chain the piece together. I chose the latter, which is start by develping with Airflow locally. 
+
+The tradeoff I made was primarily due to time constraints. I would rather have a working solution first than a perfect one from the very begining. Once a working solution is in place, I can then transition towards the end goal of running it in Airflow Kubernetes. That was my strategy to get things done. With the stack I chose, I am using [Astro CLI](https://www.astronomer.io/docs/astro/cli/overview/) and [Cosmos](https://astronomer.github.io/astronomer-cosmos/) to run the entire process.
 
 This led to the third challenge, because I used Airflow 3 and cosmos to run my dbt transformation. I found out that [dbt docs](https://astronomer.github.io/astronomer-cosmos/configuration/generating-docs.html) couldn't be host on Airflow 3 yet (_as of 2025-07-31_).
 
